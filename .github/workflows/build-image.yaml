@@ -1,3 +1,8 @@
+`pcre2grep` comes from the `pcre2-utils` package on Ubuntu.
+
+Use this workflow:
+
+```yaml id="6x5z7n"
 name: build-image
 run-name: Build shimboot image
 
@@ -11,6 +16,15 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            binwalk \
+            pcre2-utils \
+            pv \
+            cgpt
+
       - name: Make scripts executable
         run: chmod +x ./build_complete.sh
 
@@ -22,3 +36,4 @@ jobs:
         with:
           name: shimboot_dedede
           path: data/shimboot_dedede.img
+```
