@@ -11,8 +11,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Make scripts executable
+        run: chmod +x ./build_complete.sh
+
       - name: Run build
-        run: sudo ./build_complete.sh dedede distro=gentoo
+        run: sudo bash ./build_complete.sh dedede distro=gentoo
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
