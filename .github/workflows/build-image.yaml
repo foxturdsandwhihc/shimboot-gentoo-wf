@@ -22,8 +22,9 @@ jobs:
             pv \
             cgpt
 
-      - name: Make script executable
-        run: chmod +x ./build_complete.sh
+      - name: Make scripts executable
+        run: |
+          find . -type f -name "*.sh" -exec chmod +x {} \;
 
       - name: Run build
         run: sudo bash ./build_complete.sh dedede distro=gentoo
