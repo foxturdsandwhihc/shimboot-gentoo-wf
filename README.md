@@ -1,4 +1,4 @@
-# shimboot-gentoo-2
+# shimboot-gentoo-2 (school fork)
 
 > Boot a **minimal Gentoo Linux** (or Alpine/Debian) from a Chrome OS RMA shim.  
 > Fork of [ading2210/shimboot](https://github.com/ading2210/shimboot) — tuned for **speed** and **minimal size**.
