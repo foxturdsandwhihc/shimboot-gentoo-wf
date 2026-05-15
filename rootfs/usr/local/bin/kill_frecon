@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+# kill_frecon -- release the framebuffer console claimed by Chrome OS's
+# frecon-lite so that agetty / Xorg / Wayland can take over.
+#
+# Called from /etc/init.d/kill-frecon during the OpenRC `boot` runlevel,
+# *before* sysvinit respawns the gettys.
+
+_log() { printf '[kill_frecon] %s\n' "$*"; }
+
+# 1. The shim bootloader bind-mounts /dev/console over a regular file so
+#    that pivot_root works.  Drop that bind so /dev/console points at the
+#    framebuffer-attached VT again.
+if mountpoint -q /dev/console 2>/dev/null; then
+  if umount -l /dev/console 2>/dev/null; then
+    _log "/dev/console: lazy-unmounted"
+  else
+    _log "/dev/console: umount failed"
+  fi
+else
+  _log "/dev/console: not a mountpoint (fine)"
+fi
+
+# 2. Tell frecon-lite to exit; it owns /dev/fb0 and the active VT.
+if pgrep -x frecon-lite >/dev/null 2>&1; then
+  pkill -TERM frecon-lite 2>/dev/null && _log "frecon-lite: SIGTERM"
+  for _ in 1 2 3 4 5; do
+    pgrep -x frecon-lite >/dev/null 2>&1 || break
+    sleep 0.2
+  done
+  if pgrep -x frecon-lite >/dev/null 2>&1; then
+    pkill -KILL frecon-lite 2>/dev/null && _log "frecon-lite: SIGKILL"
+  else
+    _log "frecon-lite: exited cleanly"
+  fi
+else
+  _log "frecon-lite: not running"
+fi
+
+# 3. Kick fbcon to repaint VT1.
+if [ -w /sys/class/vtconsole/vtcon1/bind ]; then
+  echo 1 > /sys/class/vtconsole/vtcon1/bind 2>/dev/null && _log "vtcon1: rebound"
+fi
+
+# 4. Switch to tty1 so the user sees the login prompt immediately.
+if command -v chvt >/dev/null 2>&1; then
+  chvt 1 2>/dev/null && _log "chvt 1: ok"
+fi
+
+_log "done."
+exit 0

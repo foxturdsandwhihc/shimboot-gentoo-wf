@@ -1,0 +1,16 @@
+# shimboot-gentoo-2 .gitignore
+
+# Build output
+data/
+*.img
+*.zip
+*.bin
+
+# Temp files
+/tmp/
+
+# Editor garbage
+*.swp
+*.swo
+*~
+.DS_Store
